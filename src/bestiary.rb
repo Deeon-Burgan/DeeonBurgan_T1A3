@@ -1,4 +1,6 @@
 require "tty-prompt"
+require "tty-font"
+require "tty-link"
 require 'json'
 
 class Bestiary
@@ -8,8 +10,14 @@ class Bestiary
     def initialize(file_path)
         @beasts = []
         @prompt = TTY::Prompt.new
+        @font = TTY::Font.new(:starwars)
+        @pastel = Pastel.new
         @file_path = file_path
         load_data
+    end
+
+    def display_title
+        puts @pastel.yellow(@font.write("BEASTS"))
     end
 
     def get_string_input(output_request)
@@ -178,13 +186,13 @@ prompt = TTY::Prompt.new
 
 loop do
     system 'clear'
-
+    a.display_title
     input = prompt.select("menu") do |menu|
         menu.choice 'add new entry', 1
         menu.choice 'edit entry', 2
         menu.choice 'display random entry', 3
-        menu.choice 'display 5 entries', 4
-        menu.choice 'list entries', 5
+        menu.choice 'display 5 random entries', 4
+        menu.choice 'list all entries', 5
         menu.choice 'exit', 999
     end
 
