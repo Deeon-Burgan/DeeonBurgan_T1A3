@@ -2,6 +2,7 @@ require "tty-prompt"
 require "tty-font"
 require "tty-link"
 require 'json'
+require 'httparty'
 require './classes/entry.rb'
 
 class Bestiary
@@ -24,6 +25,43 @@ class Bestiary
     def get_string_input(output_request)
         puts output_request
         gets.chomp
+    end
+
+    def run
+        loop do
+            system 'clear'
+            display_title
+            input = @prompt.select("menu") do |menu|
+                menu.choice 'find entry', 1
+                if @beasts.count > 0
+                    menu.choice 'edit entry', 2
+                    menu.choice 'display random entry', 3
+                    menu.choice 'list 5 random entries', 4
+                    menu.choice 'list all entries', 5
+                else
+                    menu.choice 'edit entry', 2, disabled: '(no entries available)'
+                    menu.choice 'display random entry', 3, disabled: '(no entries available)'
+                    menu.choice 'list 5 random entries', 4, disabled: '(no entries available)'
+                    menu.choice 'list all entries', 5, disabled: '(no entries available)'
+                end
+                menu.choice 'exit', 999
+            end
+        
+            case input
+            when 1
+                display_search_entry
+            when 2
+                edit_entry_unknown
+            when 3
+                display_random_entry
+            when 4
+                list_5_entries
+            when 5
+                list_entries
+            when 999
+                exit
+            end
+        end
     end
 
     def add_entry
@@ -67,7 +105,23 @@ class Bestiary
         #     break
         # end
         description = get_string_input("Enter the description for this creature: ")
-        external = get_string_input("Enter an external link for more information")
+        external = ""
+        loop do
+            external = get_string_input("Enter an external link for more information")
+            begin
+                
+                response = HTTParty.get(external)
+            rescue Errno::ECONNREFUSED
+                puts 'unable to pass link, please retry'
+                redo
+            end
+            if response.code != 200
+                puts "Link not valid"
+                redo
+            end
+
+            break
+        end
         ne = Entry.new(name, description, external)
         @beasts << ne 
         # newEntry = {name: name, description: description}
@@ -202,11 +256,7 @@ class Bestiary
             clear_sys
             puts "Beast name: #{entry.name}"
             puts entry.description
-            puts entry.external
-            # puts "Name: #{entry[:name]}"
-            # puts entry[:description]
-            # puts
-            # return_to_menu
+            puts TTY::Link.link_to("#{entry.name} in more detail", entry.external)
             display_entry_menu ? edit_entry_known(entry) : return
         end
     end
@@ -244,7 +294,8 @@ class Bestiary
     def list_entries
         index = 0
         maxIndex = (@beasts.count.to_f / 5.0).ceil
-        puts maxIndex
+        # puts maxIndex
+        @beasts = @beasts.sort_by {|beast| beast.name.upcase}
 
         loop do
             input = @prompt.select("") do |menu|
@@ -327,32 +378,6 @@ end
 a = Bestiary.new('./data/saved-data.json')
 prompt = TTY::Prompt.new
 
-loop do
-    system 'clear'
-    a.display_title
-    input = prompt.select("menu") do |menu|
-        menu.choice 'find entry', 1
-        menu.choice 'edit entry', 2
-        menu.choice 'display random entry', 3
-        menu.choice 'list 5 random entries', 4
-        menu.choice 'list all entries', 5
-        menu.choice 'exit', 999
-    end
-
-    case input
-    when 1
-        a.display_search_entry
-    when 2
-        a.edit_entry_unknown
-    when 3
-        a.display_random_entry
-    when 4
-        a.list_5_entries
-    when 5
-        a.list_entries
-    when 999
-        exit
-    end
-end
+a.run
 
 a.edit_entry_unknown
