@@ -147,7 +147,7 @@ class Bestiary
         matchesWinner = nil
         matchesCount = 0
 
-        @beasts.each do |beast| 
+        @beasts.each_with_index do |beast, index| 
             matches = 0
             tags.each do |tag| 
                 if tag.upcase == beast.name.upcase
@@ -164,22 +164,37 @@ class Bestiary
                 end
             end
 
-            if matches >= matchesCount
-                matchesWinner = beast
-                matchesCount = matches
+            # if matches >= matchesCount
+            #     matchesWinner = beast
+            #     matchesCount = matches
+            # end
+            if matches != 0
+                matchesList << {"beast" => beast, "index" => index}
             end
         end
 
-        if matchesCount == 0
-            # case get_confirmation("add a new entry?")
-            # when true
-            #     return add_entry
-            # when false
-            #     return nil
-            # end
+        if matchesList.count <= 0
             return nil
+        else
+            input = @prompt.select 'matched entries' do |menu|
+                matchesList.each do |match|
+                    menu.choice match["beast"].name, match["index"]
+                end
+            end
+
+            return @beasts[input]
         end
-        return matchesWinner
+
+        # if matchesCount == 0
+        #     # case get_confirmation("add a new entry?")
+        #     # when true
+        #     #     return add_entry
+        #     # when false
+        #     #     return nil
+        #     # end
+        #     return nil
+        # end
+        # return matchesWinner
     end
 
     def display_entry(entry)
