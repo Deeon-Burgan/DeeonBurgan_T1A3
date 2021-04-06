@@ -65,7 +65,6 @@ class Bestiary
     end
 
     def add_entry
-        # loop do 
             name = get_string_input("Please enter the name: ")
 
             nameAvail = true
@@ -94,16 +93,9 @@ class Bestiary
                 when 3
                     return
                 end
-                # case get_confirmation("edit the existing entry?")
-                # when true
-                #     edit_entry_known(beastI)
-                #     display_entry(beastI)
-                # end
                 return
             end
 
-        #     break
-        # end
         description = get_string_input("Enter the description for this creature: ")
         external = ""
         loop do
@@ -124,14 +116,11 @@ class Bestiary
         end
         ne = Entry.new(name, description, external)
         @beasts << ne 
-        # newEntry = {name: name, description: description}
-        # @beasts << newEntry
         save_data
         ne
     end
 
     def get_confirmation(thingToConfirm)
-        # puts confirmationText + thingToConfirm
         @prompt.yes?("Would you like to " + thingToConfirm)
     end
 
@@ -183,7 +172,6 @@ class Bestiary
     def find_entry
         searchTags = ''
         tags = []
-
         loop do
             clear_sys
             searchTags = get_string_input("What are you looking for?")
@@ -193,40 +181,28 @@ class Bestiary
                 gets
                 redo
             end
-
             break
         end
-
         matchesList = []
         matchesWinner = nil
         matchesCount = 0
-
         @beasts.each_with_index do |beast, index| 
             matches = 0
             tags.each do |tag| 
                 if tag.upcase == beast.name.upcase
-                # if tag.upcase == beast[:name].upcase
                     matches += 1
                 end
-
                 descriptionArray = beast.description.split(" ")
-                # descriptionArray = beast[:description].split(" ")
                 descriptionArray.each do |word| 
                     if tag.upcase == word.upcase
                         matches += 0.1
                     end
                 end
             end
-
-            # if matches >= matchesCount
-            #     matchesWinner = beast
-            #     matchesCount = matches
-            # end
             if matches != 0
                 matchesList << {"beast" => beast, "index" => index}
             end
         end
-
         if matchesList.count <= 0
             return nil
         else
@@ -234,21 +210,16 @@ class Bestiary
                 matchesList.each do |match|
                     menu.choice match["beast"].name, match["index"]
                 end
+
+                menu.choice 'Create new entry?', 1000
             end
-
-            return @beasts[input]
+            case input
+            when 1000
+                return nil
+            else
+                return @beasts[input]
+            end
         end
-
-        # if matchesCount == 0
-        #     # case get_confirmation("add a new entry?")
-        #     # when true
-        #     #     return add_entry
-        #     # when false
-        #     #     return nil
-        #     # end
-        #     return nil
-        # end
-        # return matchesWinner
     end
 
     def display_entry(entry)
@@ -298,10 +269,9 @@ class Bestiary
         @beasts = @beasts.sort_by {|beast| beast.name.upcase}
 
         loop do
-            input = @prompt.select("") do |menu|
+            input = @prompt.select("", per_page: 7) do |menu|
                 for i in 0..4 do 
                     arrI = i + (index * 5)
-                    # menu.choice @beasts[arrI][:name], arrI if arrI < @beasts.count
                     menu.choice @beasts[arrI].name, arrI if arrI < @beasts.count
                 end
                 menu.choice "Next", 100 if index + 1 != maxIndex
