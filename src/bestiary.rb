@@ -4,6 +4,7 @@ require "tty-link"
 require 'json'
 require 'httparty'
 require './classes/entry.rb'
+require './helpers/image.rb'
 
 class Bestiary
 
@@ -332,11 +333,6 @@ class Bestiary
     def load_data()
         data = JSON.parse(File.read(@file_path), create_additions: true)
         @beasts = data
-        puts @beasts
-        gets
-        # @beasts = data.map do |beast| 
-        #     beast.transform_keys(&:to_sym)
-        # end
     rescue Errno::ENOENT
         File.open(@file_path, 'w+')
         File.write(@file_path, [])
@@ -347,7 +343,8 @@ end
 
 a = Bestiary.new('./data/saved-data.json')
 prompt = TTY::Prompt.new
+# Timage.DrawImage("./Knossos_fresco_in_throne_palace.JPG")
 
 a.run
 
-a.edit_entry_unknown
+# a.edit_entry_unknown
