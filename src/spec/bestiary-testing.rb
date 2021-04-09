@@ -63,4 +63,31 @@ RSpec.describe Bestiary do
             expect((bestiary.check_available_name(name)["matched"]) == true).to eq true
         end
     end
+
+    describe 'Finding entries' do
+        before do
+            bestiary.add_known_entry("Sweater", "isn't animal but clothing", "")
+            bestiary.add_known_entry("Weather", "isn't animal but status of global temperature and world state", "")
+            bestiary.add_known_entry("Clothing", "is many things, including Sweater", "")
+        end
+
+        let(:input) {StringIO.new("Sweater")}
+        it 'should get list of all matching entries' do
+            $stdin = input
+            expectedEntry1 = Entry.new("Sweater", "isn't animal but clothing", "")
+            expectedEntry2 = Entry.new("Clothing", "is many things, including Sweater", "")
+            matches = bestiary.find_matching_entries
+            puts matches
+            gets
+
+            expect(matches[0]["beast"] == expectedEntry1 && matches[1]["beast"] == expectedEntry2).to eq true
+        end
+
+        let(:input) {StringIO.new('blah')}
+        it 'should return emtpy array if no matches are found' do
+            $stdin = input
+            matches = bestiary.find_matching_entries
+            expect(matches.count).to be 0
+        end
+    end
 end
