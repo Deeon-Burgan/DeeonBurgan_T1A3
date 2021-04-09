@@ -27,3 +27,18 @@ This new entry will be saved and will be loaded next time the application is ope
 creature will be open to change.
 
 ## Outline of user interaction and experience:
+- Users will be told how to interact with each feature through terminal output and menu descriptions.
+- Users will interact through using tty-prompt menus and terminal inputs.
+- Errors when/if they exist will be handled through rescues, and the issues will be displayed to the user through terminal outputs as well.
+
+## Control flow of application
+![uml diagram](./docs/uml.png)
+
+## Task tracking system
+![pic of trello](./docs/tasktracking.PNG)
+
+## Help documentation
+1. download all files from repository
+2. locate gemfile in terminal 
+3. run bundler install
+4. run ruby bestiary-app.rb
