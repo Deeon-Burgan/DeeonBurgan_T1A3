@@ -15,4 +15,11 @@ class Entry
     def self.json_create(data)
         new data["name"], data["description"], data["external"]
     end
+
+    def ==(other)
+        if @name != other.name || @description != other.description || @external != other.external
+            return false
+        end
+        return true
+    end
 end

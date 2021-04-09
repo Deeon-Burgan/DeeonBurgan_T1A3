@@ -3,8 +3,7 @@ require "tty-font"
 require "tty-link"
 require 'json'
 require 'httparty'
-require './classes/entry.rb'
-require './helpers/image.rb'
+require_relative './classes/entry.rb'
 
 class Bestiary
 
@@ -65,19 +64,21 @@ class Bestiary
         end
     end
 
-    def add_entry
-            name = get_string_input("Please enter the name: ")
-
-            nameAvail = true
-            beastI = nil
-            @beasts.each do |beast|
-                if name.upcase == beast.name.upcase
-                    nameAvail = false
-                    beastI = beast
-                end
+    def check_available_name(name)
+        @beasts.each do |beast|
+            if name.upcase == beast.name.upcase
+                return {"matched" => true, "beast" => beast}
             end
+        end
+        return {"matched" => false, "beast" => nil}
+    end
 
-            unless nameAvail
+    def add_entry
+            name = get_string_input("Please enter the name: ").strip
+
+            available = check_available_name(name)
+
+            unless available["matched"] == false
                 # found a match
                 puts 'An existing entry with that name has been found'
                 input = @prompt.select 'What would you like to do?' do |menu|
@@ -87,10 +88,10 @@ class Bestiary
                 end
                 case input
                 when 1
-                    edit_entry_known(beastI)
-                    display_entry(beastI)
+                    edit_entry_known(available["beast"])
+                    display_entry(available["beast"])
                 when 2
-                    display_entry(beastI)
+                    display_entry(available["beast"])
                 when 3
                     return
                 end
@@ -99,11 +100,19 @@ class Bestiary
 
         description = get_string_input("Enter the description for this creature: ")
         external = ""
+        tryCounter = 0
         loop do
+            tryCounter += 1
+            attemptsLeft = 3 - tryCounter
+            puts "Attempts left: #{attemptsLeft + 1}"
+            if tryCounter >= 4
+                external = ''
+                break
+            end
             external = get_string_input("Enter an external link for more information")
             begin
                 
-                response = HTTParty.get(external)
+                response = get_http_request(external)
             rescue Errno::ECONNREFUSED
                 puts 'unable to pass link, please retry'
                 redo
@@ -115,9 +124,19 @@ class Bestiary
 
             break
         end
-        ne = Entry.new(name, description, external)
-        @beasts << ne 
+        
+        add_known_entry(name, description, external)
         save_data
+    end
+
+    def get_http_request(link)
+        return HTTParty.get(link)
+    end
+
+
+    def add_known_entry(a_name, a_description, a_external)
+        ne = Entry.new(a_name, a_description, a_external)
+        @beasts << ne 
         ne
     end
 
@@ -170,7 +189,7 @@ class Bestiary
         display_entry(entry)
     end
 
-    def find_entry
+    def find_matching_entries
         searchTags = ''
         tags = []
         loop do
@@ -188,6 +207,7 @@ class Bestiary
         matchesWinner = nil
         matchesCount = 0
         @beasts.each_with_index do |beast, index| 
+            # puts beast.name
             matches = 0
             tags.each do |tag| 
                 if tag.upcase == beast.name.upcase
@@ -204,6 +224,11 @@ class Bestiary
                 matchesList << {"beast" => beast, "index" => index}
             end
         end
+        return matchesList
+    end
+
+    def find_entry
+        matchesList = find_matching_entries
         if matchesList.count <= 0
             return nil
         else
@@ -228,7 +253,7 @@ class Bestiary
             clear_sys
             puts "Beast name: #{entry.name}"
             puts entry.description
-            puts TTY::Link.link_to("#{entry.name} in more detail", entry.external)
+            entry.external == '' ? (puts '') : (puts TTY::Link.link_to("#{entry.name} in more detail", entry.external))
             display_entry_menu ? edit_entry_known(entry) : return
         end
     end
@@ -340,11 +365,3 @@ class Bestiary
     end
 
 end
-
-a = Bestiary.new('./data/saved-data.json')
-prompt = TTY::Prompt.new
-# Timage.DrawImage("./Knossos_fresco_in_throne_palace.JPG")
-
-a.run
-
-# a.edit_entry_unknown

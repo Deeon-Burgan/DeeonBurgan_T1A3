@@ -1,0 +1,12 @@
+source 'https://rubygems.org'
+
+group :tty_plugins do 
+    gem 'tty-prompt'
+    gem 'tty-font'
+    gem 'tty-link'
+end
+
+group :misc_plugins do
+    gem 'httparty'
+    gem 'json'
+end
