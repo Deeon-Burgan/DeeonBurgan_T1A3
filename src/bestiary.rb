@@ -30,38 +30,48 @@ class Bestiary
     end
 
     def run
-        loop do
-            system 'clear'
-            display_title
-            input = @prompt.select("menu") do |menu|
-                menu.choice 'find entry', 1
-                if @beasts.count > 0
-                    menu.choice 'edit entry', 2
-                    menu.choice 'display random entry', 3
-                    menu.choice 'list 5 random entries', 4
-                    menu.choice 'list all entries', 5
-                else
-                    menu.choice 'edit entry', 2, disabled: '(no entries available)'
-                    menu.choice 'display random entry', 3, disabled: '(no entries available)'
-                    menu.choice 'list 5 random entries', 4, disabled: '(no entries available)'
-                    menu.choice 'list all entries', 5, disabled: '(no entries available)'
+        if ARGV.empty?
+            loop do
+                system 'clear'
+                display_title
+                input = @prompt.select("menu") do |menu|
+                    menu.choice 'find entry', 1
+                    if @beasts.count > 0
+                        menu.choice 'edit entry', 2
+                        menu.choice 'display random entry', 3
+                        menu.choice 'list 5 random entries', 4
+                        menu.choice 'list all entries', 5
+                    else
+                        menu.choice 'edit entry', 2, disabled: '(no entries available)'
+                        menu.choice 'display random entry', 3, disabled: '(no entries available)'
+                        menu.choice 'list 5 random entries', 4, disabled: '(no entries available)'
+                        menu.choice 'list all entries', 5, disabled: '(no entries available)'
+                    end
+                    menu.choice 'exit', 999
                 end
-                menu.choice 'exit', 999
+            
+                case input
+                when 1
+                    display_search_entry
+                when 2
+                    edit_entry_unknown
+                when 3
+                    display_random_entry
+                when 4
+                    list_5_entries
+                when 5
+                    list_entries
+                when 999
+                    exit
+                end
             end
-        
-            case input
-            when 1
-                display_search_entry
-            when 2
-                edit_entry_unknown
-            when 3
-                display_random_entry
-            when 4
-                list_5_entries
-            when 5
-                list_entries
-            when 999
-                exit
+
+        else
+            if ARGV.count == 2
+                case ARGV[0]
+                when 'find'
+                    display_entry(find_entry(true, ARGV[1]))
+                end
             end
         end
     end
@@ -127,7 +137,7 @@ class Bestiary
             break
         end
 
-        if external = ""
+        if external == ""
                 saved_name = name.tr(" ", "_")
                 puts saved_name
                 gets
@@ -190,7 +200,7 @@ class Bestiary
     end
 
     def edit_entry_unknown
-        entry = find_entry()
+        entry = find_entry(false, nil)
         # sanity check entry
         begin
         edit_entry_known(entry)
@@ -202,19 +212,26 @@ class Bestiary
         display_entry(entry)
     end
 
-    def find_matching_entries
+    def find_matching_entries(argv, input)
         searchTags = ''
         tags = []
-        loop do
-            clear_sys
-            searchTags = get_string_input("What are you looking for?")
-            tags = searchTags.split(" ")
-            if tags.count <= 0
-                puts "No search query found"
-                gets
-                redo
+        
+        unless argv
+            loop do
+                clear_sys
+                searchTags = get_string_input("What are you looking for?")
+                tags = searchTags.split(" ")
+                if tags.count <= 0
+                    puts "No search query found"
+                    gets
+                    redo
+                end
+                break
             end
-            break
+        end
+        if argv 
+            searchTags = input
+            tags = searchTags.split(" ")
         end
         matchesList = []
         matchesWinner = nil
@@ -244,8 +261,8 @@ class Bestiary
         return matchesList
     end
 
-    def find_entry
-        matchesList = find_matching_entries
+    def find_entry(argv, input)
+        matchesList = find_matching_entries(argv, input)
         if matchesList.count <= 0
             return nil
         else
@@ -338,7 +355,7 @@ class Bestiary
 
     def display_search_entry
         # add rescue for nil entry
-        entry = find_entry
+        entry = find_entry(false, nil)
         # entry != nil ? display_entry(entry) : return
         if entry == nil
             case get_confirmation("add a new entry?")
