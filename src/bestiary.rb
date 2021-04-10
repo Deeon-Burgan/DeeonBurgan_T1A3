@@ -126,6 +126,17 @@ class Bestiary
 
             break
         end
+
+        if external = ""
+                saved_name = name.tr(" ", "_")
+                puts saved_name
+                gets
+                link = "https://en.wikipedia.org/wiki/#{saved_name}"
+                response = get_http_request(link)
+                if response.code == 200
+                    external = link
+                end
+        end
         
         add_known_entry(name, description, external)
         save_data
