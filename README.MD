@@ -1,4 +1,7 @@
 # Mythological Bestiary
+## Access
+[Link to repository](https://github.com/Deeon-Burgan/DeeonBurgan_T1A3)
+
 ## Purpose and scope: 
 This application will record, document and provide information on a myriad of mythical creatures.  
 It will also allow the user to edit any information, and will allow the user to create new entries on creatures  
