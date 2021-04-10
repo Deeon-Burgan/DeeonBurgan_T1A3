@@ -9,4 +9,5 @@ end
 group :misc_plugins do
     gem 'httparty'
     gem 'json'
+    gem 'colorize'
 end
