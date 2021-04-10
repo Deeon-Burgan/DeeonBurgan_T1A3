@@ -41,4 +41,16 @@ creature will be open to change.
 1. download all files from repository
 2. locate gemfile in terminal 
 3. run bundler install
-4. run ruby bestiary-app.rb
+4. run ruby bestiary-app.rb  
+
+or  
+
+1. download all files from repository
+2. run bash on bestiary-app.sh  
+
+or  
+
+1. download all files from repository
+2. navigate to gemfile
+3. run bundler install
+4. run the file path of bestiary-app.rb in terminal
