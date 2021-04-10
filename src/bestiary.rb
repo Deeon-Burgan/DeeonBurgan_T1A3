@@ -223,6 +223,10 @@ class Bestiary
             # puts beast.name
             matches = 0
             tags.each do |tag| 
+                beastNameTags = beast.name.split(" ")
+                if beastNameTags.include? tag
+                    matches += 1
+                end
                 if tag.upcase == beast.name.upcase
                     matches += 1
                 end
