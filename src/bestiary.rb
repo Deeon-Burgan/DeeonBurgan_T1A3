@@ -143,7 +143,7 @@ class Bestiary
     end
 
     def get_confirmation(thingToConfirm)
-        @prompt.yes?("Would you like to " + thingToConfirm)
+        @prompt.yes?("Would you like to #{thingToConfirm}".colorize(:green))
     end
 
     def return_to_menu
