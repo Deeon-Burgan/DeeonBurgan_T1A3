@@ -17,6 +17,9 @@ class Entry
     end
 
     def ==(other)
+        if other == nil
+            return false
+        end
         if @name != other.name || @description != other.description || @external != other.external
             return false
         end
