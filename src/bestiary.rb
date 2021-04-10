@@ -3,6 +3,8 @@ require "tty-font"
 require "tty-link"
 require 'json'
 require 'httparty'
+require 'colorize'
+require 'colorized_string'
 require_relative './classes/entry.rb'
 
 class Bestiary
@@ -253,7 +255,7 @@ class Bestiary
             clear_sys
             puts "Beast name: #{entry.name}"
             puts entry.description
-            entry.external == '' ? (puts '') : (puts TTY::Link.link_to("#{entry.name} in more detail", entry.external))
+            entry.external == '' ? (puts '') : (puts TTY::Link.link_to("#{entry.name} in more detail".colorize(:blue), entry.external))
             display_entry_menu ? edit_entry_known(entry) : return
         end
     end
