@@ -1,6 +1,7 @@
 # Mythological Bestiary
 ## Access
 [Link to repository](https://github.com/Deeon-Burgan/DeeonBurgan_T1A3)
+[Link to Trello](https://trello.com/b/26ZYSELf/bestiary-console-app)
 
 ## Purpose and scope: 
 This application will act as a personal bestiary for any user, that will record, document and provide information on a myriad of mythological creatures, that the user has come across and provided information on.  
